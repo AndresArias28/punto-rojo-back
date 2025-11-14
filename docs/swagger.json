@@ -1,0 +1,269 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Punto Rojo API",
+    "version": "1.0.0",
+    "description": "Documentación oficial de la API para Punto Rojo"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3333",
+      "description": "Servidor local"
+    }
+  ],
+  "paths": {
+    "/clientes": {
+      "get": {
+        "summary": "Listar clientes",
+        "tags": ["Clientes"],
+        "responses": { "200": { "description": "Lista de clientes" } }
+      },
+      "post": {
+        "summary": "Crear cliente",
+        "tags": ["Clientes"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ClienteInput" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Cliente creado" } }
+      }
+    },
+
+    "/clientes/{id}": {
+      "get": {
+        "summary": "Obtener cliente por ID",
+        "tags": ["Clientes"],
+        "parameters": [
+          { "$ref": "#/components/parameters/IdPathParam" }
+        ],
+        "responses": { "200": { "description": "Cliente encontrado" } }
+      },
+      "put": {
+        "summary": "Actualizar cliente",
+        "tags": ["Clientes"],
+        "parameters": [
+          { "$ref": "#/components/parameters/IdPathParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ClienteInput" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Cliente actualizado" } }
+      },
+      "delete": {
+        "summary": "Eliminar cliente",
+        "tags": ["Clientes"],
+        "parameters": [
+          { "$ref": "#/components/parameters/IdPathParam" }
+        ],
+        "responses": { "200": { "description": "Cliente eliminado" } }
+      }
+    },
+
+    "/productos": {
+      "get": {
+        "summary": "Listar productos",
+        "tags": ["Productos"],
+        "responses": { "200": { "description": "Lista de productos" } }
+      },
+      "post": {
+        "summary": "Crear producto",
+        "tags": ["Productos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductoInput" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Producto creado" } }
+      }
+    },
+
+    "/productos/{id}": {
+      "get": {
+        "summary": "Obtener producto por ID",
+        "tags": ["Productos"],
+        "parameters": [{ "$ref": "#/components/parameters/IdPathParam" }],
+        "responses": { "200": { "description": "Producto encontrado" } }
+      },
+      "put": {
+        "summary": "Actualizar producto",
+        "tags": ["Productos"],
+        "parameters": [{ "$ref": "#/components/parameters/IdPathParam" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductoInput" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Producto actualizado" } }
+      },
+      "delete": {
+        "summary": "Eliminar producto",
+        "tags": ["Productos"],
+        "parameters": [{ "$ref": "#/components/parameters/IdPathParam" }],
+        "responses": { "200": { "description": "Producto eliminado" } }
+      }
+    },
+
+    "/facturas": {
+      "get": {
+        "summary": "Listar facturas",
+        "tags": ["Facturas"],
+        "responses": { "200": { "description": "Lista de facturas" } }
+      },
+      "post": {
+        "summary": "Crear factura",
+        "tags": ["Facturas"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/FacturaInput" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Factura creada" } }
+      }
+    },
+
+    "/facturas/{id}": {
+      "get": {
+        "summary": "Obtener factura por ID",
+        "tags": ["Facturas"],
+        "parameters": [{ "$ref": "#/components/parameters/IdPathParam" }],
+        "responses": { "200": { "description": "Factura encontrada" } }
+      },
+      "delete": {
+        "summary": "Eliminar factura",
+        "tags": ["Facturas"],
+        "parameters": [{ "$ref": "#/components/parameters/IdPathParam" }],
+        "responses": { "200": { "description": "Factura eliminada" } }
+      }
+    },
+
+    "/precios": {
+      "get": {
+        "summary": "Listar precios por cliente",
+        "tags": ["Precios Especiales"],
+        "responses": { "200": { "description": "Lista de precios" } }
+      },
+      "post": {
+        "summary": "Crear precio especial",
+        "tags": ["Precios Especiales"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PrecioEspecialInput" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Precio especial creado" } }
+      }
+    },
+
+    "/precios/{id}": {
+      "put": {
+        "summary": "Actualizar precio especial",
+        "tags": ["Precios Especiales"],
+        "parameters": [{ "$ref": "#/components/parameters/IdPathParam" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PrecioEspecialInput" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Precio especial actualizado" } }
+      },
+      "delete": {
+        "summary": "Eliminar precio especial",
+        "tags": ["Precios Especiales"],
+        "parameters": [{ "$ref": "#/components/parameters/IdPathParam" }],
+        "responses": { "200": { "description": "Precio especial eliminado" } }
+      }
+    }
+  },
+
+  "components": {
+    "parameters": {
+      "IdPathParam": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer" }
+      }
+    },
+
+    "schemas": {
+      "ClienteInput": {
+        "type": "object",
+        "properties": {
+          "nombre": { "type": "string" },
+          "documento": { "type": "string" },
+          "direccion": { "type": "string" },
+          "telefono": { "type": "string" },
+          "email": { "type": "string" },
+          "tipo_cliente": { "type": "string" }
+        }
+      },
+
+      "ProductoInput": {
+        "type": "object",
+        "properties": {
+          "codigo": { "type": "string" },
+          "nombre": { "type": "string" },
+          "descripcion": { "type": "string" },
+          "precio_base": { "type": "number" },
+          "stock": { "type": "number" },
+          "unidad_medida": { "type": "string" }
+        }
+      },
+
+      "PrecioEspecialInput": {
+        "type": "object",
+        "properties": {
+          "id_cliente": { "type": "integer" },
+          "id_producto": { "type": "integer" },
+          "precio_especial": { "type": "number" }
+        }
+      },
+
+      "FacturaInput": {
+        "type": "object",
+        "properties": {
+          "id_cliente": { "type": "integer" },
+          "metodo_pago": { "type": "string" },
+          "notas": { "type": "string" },
+          "detalle": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DetalleFactura" }
+          }
+        }
+      },
+
+      "DetalleFactura": {
+        "type": "object",
+        "properties": {
+          "id_producto": { "type": "integer" },
+          "cantidad": { "type": "number" },
+          "precio_unitario": { "type": "number" }
+        }
+      }
+    }
+  }
+}
