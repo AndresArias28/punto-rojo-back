@@ -94,8 +94,6 @@ export default class PreciosController {
       const validator = vine.compile(
         vine.object({
           precioEspecial: vine.number().positive().optional(),
-          fechaInicio: vine.date().optional(),
-          fechaFin: vine.date().optional(),
           estado: vine.boolean().optional(),
         })
       )

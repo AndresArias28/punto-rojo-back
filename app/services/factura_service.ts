@@ -68,9 +68,6 @@ export default class FacturaService {
       for (const item of datos.items) {
         // Verificar stock
         const producto = await Producto.findOrFail(item.idProducto)
-        if (producto.stock < item.cantidad) {
-          throw new Error(`Stock insuficiente para el producto: ${producto.nombre}`)
-        }
 
         // Obtener precio correcto según cliente
         const precioUnitario = await this.precioService.obtenerPrecioParaCliente(
@@ -90,6 +87,7 @@ export default class FacturaService {
         detalle.descuento = descuento
         detalle.subtotalLinea = subtotalLinea
 
+        //esto es para guardar en la base de datos
         await detalle.useTransaction(trx).save()
 
         // Actualizar stock

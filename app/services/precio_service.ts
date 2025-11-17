@@ -1,4 +1,3 @@
-import Producto from '#models/producto'
 import PrecioPorCliente from '#models/precio_por_cliente'
 import { DateTime } from 'luxon'
 
@@ -22,10 +21,7 @@ export default class PrecioService {
     if (precioEspecial) {
       return precioEspecial.precioEspecial
     }
-
-    // Si no hay precio especial, usar precio base
-    const producto = await Producto.findOrFail(idProducto)
-    return producto.precioBase
+    return 0
   }
 
   /**

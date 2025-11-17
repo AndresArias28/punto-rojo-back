@@ -24,9 +24,6 @@ export default class DetalleFactura extends BaseModel {
   @column()
   declare descuento: number
 
-  @column({ columnName: 'subtotal_linea' })
-  declare subtotalLinea: number
-
   @belongsTo(() => Factura, {
     foreignKey: 'idFactura',
   })

@@ -218,7 +218,8 @@
           "direccion": { "type": "string" },
           "telefono": { "type": "string" },
           "email": { "type": "string" },
-          "tipo_cliente": { "type": "string" }
+          "estado": { "type": "boolean" }
+
         }
       },
 

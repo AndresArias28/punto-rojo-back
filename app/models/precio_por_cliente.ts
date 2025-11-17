@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Cliente from './cliente.js'
@@ -18,12 +17,6 @@ export default class PrecioPorCliente extends BaseModel {
 
   @column({ columnName: 'precio_especial' })
   declare precioEspecial: number
-
-  @column.date({ columnName: 'fecha_inicio' })
-  declare fechaInicio: DateTime
-
-  @column.date({ columnName: 'fecha_fin' })
-  declare fechaFin: DateTime | null
 
   @column()
   declare estado: boolean

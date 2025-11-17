@@ -19,14 +19,8 @@ export default class Producto extends BaseModel {
   @column()
   declare descripcion: string | null
 
-  @column({ columnName: 'precio_base' })
-  declare precioBase: number
-
   @column()
   declare stock: number
-
-  @column({ columnName: 'unidad_medida' })
-  declare unidadMedida: string
 
   @column()
   declare estado: boolean

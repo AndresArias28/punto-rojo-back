@@ -37,9 +37,6 @@ export default class Factura extends BaseModel {
   @column()
   declare notas: string | null
 
-  @column({ columnName: 'usuario_creacion' })
-  declare usuarioCreacion: string | null
-
   @column.dateTime({ autoCreate: true, columnName: 'fecha_creacion' })
   declare fechaCreacion: DateTime
 

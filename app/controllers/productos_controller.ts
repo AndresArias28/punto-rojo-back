@@ -1,8 +1,14 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Producto from '#models/producto'
 import { createProductoValidator, updateProductoValidator } from '#validators/producto'
+import ProductoService from '#services/producto_service'
 
 export default class ProductosController {
+  private productoService: ProductoService
+
+  constructor() {
+    this.productoService = new ProductoService()
+  }
   /**
    * GET /productos
    */
@@ -12,16 +18,7 @@ export default class ProductosController {
       const limit = request.input('limit', 20)
       const search = request.input('search')
 
-      const query = Producto.query().where('estado', true)
-
-      if (search) {
-        query.where((builder) => {
-          builder.where('nombre', 'ilike', `%${search}%`).orWhere('codigo', 'ilike', `%${search}%`)
-        })
-      }
-
-      const productos = await query.orderBy('nombre', 'asc').paginate(page, limit)
-
+      const productos = await this.productoService.listarProductos({ page, limit, search })
       return response.ok(productos)
     } catch (error) {
       return response.badRequest({ message: 'Error al listar productos', error: error.message })

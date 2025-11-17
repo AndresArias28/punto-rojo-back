@@ -6,6 +6,18 @@ export default class ClientesController {
   /**
    * GET /clientes
    */
+
+  /**
+   * @swagger
+   * /clientes:
+   *   get:
+   *     summary: Listar clientes
+   *     tags: [Clientes]
+   *     responses:
+   *       200:
+   *         description: Lista de clientes
+   */
+
   async index({ request, response }: HttpContext) {
     try {
       const page = request.input('page', 1)
