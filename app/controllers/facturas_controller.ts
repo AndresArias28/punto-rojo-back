@@ -95,7 +95,6 @@ export default class FacturasController {
           cantidad: detalle.cantidad,
           precioUnitario: detalle.precioUnitario,
           descuento: detalle.descuento,
-          subtotal: detalle.subtotalLinea,
         })),
         subtotal: factura.subtotal,
         iva: factura.iva,

@@ -57,7 +57,6 @@ export default class FacturaService {
       factura.idCliente = datos.idCliente
       factura.metodoPago = datos.metodoPago || null
       factura.notas = datos.notas || null
-      factura.usuarioCreacion = datos.usuarioCreacion || null
       factura.estado = 'pagada'
 
       await factura.useTransaction(trx).save()
@@ -85,7 +84,6 @@ export default class FacturaService {
         detalle.cantidad = item.cantidad
         detalle.precioUnitario = precioUnitario
         detalle.descuento = descuento
-        detalle.subtotalLinea = subtotalLinea
 
         //esto es para guardar en la base de datos
         await detalle.useTransaction(trx).save()
