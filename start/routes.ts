@@ -6,11 +6,6 @@ const FacturasController = () => import('#controllers/facturas_controller')
 const PreciosController = () => import('#controllers/precios_controller')
 const SwaggerController = () => import('#controllers/swagger_controller')
 
-/* ---------------------------
-🟦 Rutas SWAGGER (CORRECTAS)
---------------------------- */
-
-// UI principal
 Route.get('/docs', [SwaggerController, 'ui'])
 
 // Archivos de Swagger UI (CSS, JS, PNG, etc.)
@@ -28,6 +23,7 @@ Route.group(() => {
   Route.post('/', [ClientesController, 'store'])
   Route.put('/:id', [ClientesController, 'update'])
   Route.delete('/:id', [ClientesController, 'destroy'])
+  Route.get('/precios', [ClientesController, 'listarConPrecios'])
 }).prefix('/clientes')
 
 /* ---------------------------

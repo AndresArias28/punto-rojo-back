@@ -1,22 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Cliente from '#models/cliente'
 import { createClienteValidator, updateClienteValidator } from '#validators/cliente'
+import ClienteService from '#services/cliente_service'
 
 export default class ClientesController {
-  /**
-   * GET /clientes
-   */
-
-  /**
-   * @swagger
-   * /clientes:
-   *   get:
-   *     summary: Listar clientes
-   *     tags: [Clientes]
-   *     responses:
-   *       200:
-   *         description: Lista de clientes
-   */
+  private clienteService: ClienteService = new ClienteService()
 
   async index({ request, response }: HttpContext) {
     try {
@@ -84,7 +72,6 @@ export default class ClientesController {
     try {
       const cliente = await Cliente.findOrFail(params.id)
       const data = await request.validateUsing(updateClienteValidator)
-
       cliente.merge(data)
       await cliente.save()
 
@@ -97,9 +84,6 @@ export default class ClientesController {
     }
   }
 
-  /**
-   * DELETE /clientes/:id (soft delete)
-   */
   async destroy({ params, response }: HttpContext) {
     try {
       const cliente = await Cliente.findOrFail(params.id)
@@ -110,5 +94,10 @@ export default class ClientesController {
     } catch (error) {
       return response.badRequest({ message: 'Error al desactivar cliente' })
     }
+  }
+
+  async listarConPrecios({ response }: HttpContext) {
+    const clientes = await this.clienteService.listarConPrecios()
+    return response.ok(clientes)
   }
 }
