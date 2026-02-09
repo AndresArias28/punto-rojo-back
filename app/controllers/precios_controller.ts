@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import PrecioPorCliente from '#models/precio_por_cliente'
 import PrecioService from '#services/precio_service'
-import vine from '@vinejs/vine'
 import { createPrecioPorClienteValidator } from '#validators/precio_por_cliente_validator'
 import { updatePrecioPorClienteValidator } from '#validators/precio_por_cliente_validator'
 
