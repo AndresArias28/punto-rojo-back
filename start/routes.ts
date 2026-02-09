@@ -19,11 +19,12 @@ Route.get('/docs/swagger.json', [SwaggerController, 'json'])
 --------------------------- */
 Route.group(() => {
   Route.get('/', [ClientesController, 'index'])
-  Route.get('/:id', [ClientesController, 'show'])
+  // Route.get('/:id', [ClientesController, 'show'])
+  Route.get('/:id', [ClientesController, 'show']).where('id', /^[0-9]+$/)
   Route.post('/', [ClientesController, 'store'])
-  Route.put('/:id', [ClientesController, 'update'])
-  Route.delete('/:id', [ClientesController, 'destroy'])
-  Route.get('/precios', [ClientesController, 'listarConPrecios'])
+  Route.put('/:id', [ClientesController, 'update']).where('id', /^[0-9]+$/)
+  Route.delete('/:id', [ClientesController, 'destroy']).where('id', /^[0-9]+$/)
+  Route.get('/productos', [ClientesController, 'listarConPrecios'])
 }).prefix('/clientes')
 
 /* ---------------------------
@@ -59,7 +60,8 @@ Route.group(() => {
 --------------------------- */
 Route.group(() => {
   Route.get('/', [PreciosController, 'listarPreciosCliente'])
-  Route.post('/', [PreciosController, 'store'])
-  Route.put('/:id', [PreciosController, 'update'])
-  Route.delete('/:id', [PreciosController, 'destroy'])
+  // Route.post('/', [PreciosController, 'store'])
+  Route.put('/:id', [PreciosController, 'update']).where('id', /^[0-9]+$/)
+  Route.delete('/:id', [PreciosController, 'destroy']).where('id', /^[0-9]+$/)
+  Route.post('/cliente-precio', [PreciosController, 'store'])
 }).prefix('/precios')

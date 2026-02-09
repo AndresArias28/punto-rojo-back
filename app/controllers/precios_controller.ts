@@ -2,6 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import PrecioPorCliente from '#models/precio_por_cliente'
 import PrecioService from '#services/precio_service'
 import vine from '@vinejs/vine'
+import { createPrecioPorClienteValidator } from '#validators/precio_por_cliente_validator'
+import { updatePrecioPorClienteValidator } from '#validators/precio_por_cliente_validator'
 
 export default class PreciosController {
   private precioService: PrecioService
@@ -33,7 +35,7 @@ export default class PreciosController {
 
   /**
    * GET /precios/cliente/:idCliente
-   * Lista todos los precios especiales de un cliente
+   * Lista todos los precios especiales de un cliente-
    */
   async listarPreciosCliente({ params, response }: HttpContext) {
     try {
@@ -57,30 +59,18 @@ export default class PreciosController {
    * Crea o actualiza un precio especial para un cliente
    */
   async store({ request, response }: HttpContext) {
-    try {
-      const validator = vine.compile(
-        vine.object({
-          idCliente: vine.number().positive(),
-          idProducto: vine.number().positive(),
-          precioEspecial: vine.number().positive(),
-          fechaInicio: vine.date().optional(),
-          fechaFin: vine.date().optional(),
-        })
-      )
-
-      const data = await request.validateUsing(validator)
-
-      const precio = await PrecioPorCliente.create(data)
-      await precio.load('cliente')
-      await precio.load('producto')
-
-      return response.created(precio)
-    } catch (error) {
-      return response.badRequest({
-        message: 'Error al crear precio especial',
-        error: error.messages || error.message,
-      })
-    }
+    const payload = await request.validateUsing(createPrecioPorClienteValidator)
+    const { registro, creado } = await this.precioService.upsertPrecio(
+      payload.idCliente,
+      payload.idProducto,
+      payload.precioEspecial
+    )
+    return response.status(creado ? 201 : 200).send({
+      message: creado
+        ? 'Precio especial creado correctamente'
+        : 'Precio especial actualizado correctamente',
+      precio: registro,
+    })
   }
 
   /**
@@ -90,20 +80,20 @@ export default class PreciosController {
   async update({ params, request, response }: HttpContext) {
     try {
       const precio = await PrecioPorCliente.findOrFail(params.id)
+      const data = await request.validateUsing(updatePrecioPorClienteValidator)
+      if (Object.keys(data).length === 0) {
+        return response.badRequest({ message: 'No enviaste campos para actualizar' })
+      }
 
-      const validator = vine.compile(
-        vine.object({
-          precioEspecial: vine.number().positive().optional(),
-          estado: vine.boolean().optional(),
-        })
-      )
-
-      const data = await request.validateUsing(validator)
       precio.merge(data)
       await precio.save()
 
       return response.ok(precio)
     } catch (error) {
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        return response.notFound({ message: 'Precio no encontrado' })
+      }
+
       return response.badRequest({
         message: 'Error al actualizar precio especial',
         error: error.messages || error.message,
@@ -123,7 +113,14 @@ export default class PreciosController {
 
       return response.ok({ message: 'Precio especial desactivado correctamente' })
     } catch (error) {
-      return response.badRequest({ message: 'Error al desactivar precio especial' })
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        return response.notFound({ message: 'Precio no encontrado' })
+      }
+
+      return response.badRequest({
+        message: 'Error al desactivar precio especial',
+        error: error.message || error.messages,
+      })
     }
   }
 }

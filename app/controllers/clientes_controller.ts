@@ -97,7 +97,11 @@ export default class ClientesController {
   }
 
   async listarConPrecios({ response }: HttpContext) {
-    const clientes = await this.clienteService.listarConPrecios()
-    return response.ok(clientes)
+    try {
+      const clientes = await this.clienteService.listarConPrecios()
+      return response.ok(clientes)
+    } catch (error) {
+      return response.badRequest({ message: 'Error al listar clientes con precios' })
+    }
   }
 }
