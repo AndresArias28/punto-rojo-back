@@ -4,19 +4,8 @@ const ClientesController = () => import('#controllers/clientes_controller')
 const ProductosController = () => import('#controllers/productos_controller')
 const FacturasController = () => import('#controllers/facturas_controller')
 const PreciosController = () => import('#controllers/precios_controller')
-const SwaggerController = () => import('#controllers/swagger_controller')
 
-Route.get('/docs', [SwaggerController, 'ui'])
-
-// Archivos de Swagger UI (CSS, JS, PNG, etc.)
-Route.get('/docs/swagger-ui-dist/*', [SwaggerController, 'assets'])
-
-// JSON schema de OpenAPI
-Route.get('/docs/swagger.json', [SwaggerController, 'json'])
-
-/* ---------------------------
-   🟩 Rutas Clientes
---------------------------- */
+// Rutas Clientes
 Route.group(() => {
   Route.get('/', [ClientesController, 'index'])
   // Route.get('/:id', [ClientesController, 'show'])
@@ -27,9 +16,7 @@ Route.group(() => {
   Route.get('/productos', [ClientesController, 'listarConPrecios'])
 }).prefix('/clientes')
 
-/* ---------------------------
-   🟨 Ruta Raíz
---------------------------- */
+//Ruta Raíz
 Route.get('/', async ({ response }) => {
   return response.redirect().toPath('/docs')
 })
@@ -60,7 +47,6 @@ Route.group(() => {
 --------------------------- */
 Route.group(() => {
   Route.get('/', [PreciosController, 'listarPreciosCliente'])
-  // Route.post('/', [PreciosController, 'store'])
   Route.put('/:id', [PreciosController, 'update']).where('id', /^[0-9]+$/)
   Route.delete('/:id', [PreciosController, 'destroy']).where('id', /^[0-9]+$/)
   Route.post('/cliente-precio', [PreciosController, 'store'])
