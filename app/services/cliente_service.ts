@@ -6,9 +6,11 @@ export default class ClienteService {
    */
   async listarConPrecios() {
     const clientes = await Cliente.query()
+      .where('estado', true)
       .select(['id_cliente', 'nombre'])
       .preload('preciosEspeciales', (preciosQuery) => {
         preciosQuery
+          .where('estado', true)
           .select(['id_precio_cliente', 'id_cliente', 'id_producto', 'precio_especial', 'estado'])
           .where('estado', true)
           .preload('producto', (productoQuery) => {

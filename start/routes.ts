@@ -46,7 +46,10 @@ Route.group(() => {
     Ruta Precios
 --------------------------- */
 Route.group(() => {
-  Route.get('/', [PreciosController, 'listarPreciosCliente'])
+  Route.get('/cliente/:idCliente', [PreciosController, 'listarPreciosCliente']).where(
+    'idCliente',
+    /^[0-9]+$/
+  )
   Route.put('/:id', [PreciosController, 'update']).where('id', /^[0-9]+$/)
   Route.delete('/:id', [PreciosController, 'destroy']).where('id', /^[0-9]+$/)
   Route.post('/cliente-precio', [PreciosController, 'store'])
