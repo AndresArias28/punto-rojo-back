@@ -1,7 +1,6 @@
 import Factura from '#models/factura'
 import DetalleFactura from '#models/detalle_factura'
 import Producto from '#models/producto'
-import PrecioService from './precio_service.js'
 import db from '@adonisjs/lucid/services/db'
 
 interface ItemFactura {
@@ -22,10 +21,10 @@ interface DatosFactura {
 }
 
 export default class FacturaService {
-  private precioService: PrecioService
+  // private precioService: PrecioService
 
   constructor() {
-    this.precioService = new PrecioService()
+    // this.precioService = new PrecioService()
   }
 
   /**
@@ -36,9 +35,6 @@ export default class FacturaService {
     const trx = await db.transaction()
 
     try {
-      // Generar número de factura
-      // const numeroFactura = await this.generarNumeroFactura()
-
       // Crear factura
       const factura = new Factura()
       factura.numeroFactura = datos.numeroFactura
@@ -52,17 +48,11 @@ export default class FacturaService {
 
       // Crear detalles de factura
       for (const item of datos.items) {
-        // Verificar stock
-        // const producto = await Producto.findOrFail(item.idProducto)
-
         // Obtener precio correcto según cliente
-        const precioUnitario = await this.precioService.obtenerPrecioParaCliente(
-          item.idProducto,
-          datos.idCliente
-        )
-
-        // const descuento = item.descuento || 0
-        // const subtotalLinea = item.cantidad * precioUnitario - descuento
+        // const precioUnitario = await this.precioService.obtenerPrecioParaCliente(
+        //   item.idProducto,
+        //   datos.idCliente
+        // )
 
         // Crear detalle
         const detalle = new DetalleFactura()
@@ -70,26 +60,11 @@ export default class FacturaService {
         detalle.idProducto = item.idProducto
         detalle.cantidad = item.cantidad
         detalle.precioUnitario = item.precioUnitario
-        // detalle.descuento = descuento
 
         //esto es para guardar en la base de datos
         await detalle.useTransaction(trx).save()
-
-        // Actualizar stock
-        // producto.stock -= item.cantidad
-        // await producto.useTransaction(trx).save()
-
-        // subtotalTotal += subtotalLinea
       }
 
-      // Calcular IVA (19% en Colombia, ajusta según tu país)
-      // const iva = subtotalTotal * 0.19
-      // const total = subtotalTotal + iva
-
-      // Actualizar totales de factura
-      // factura.subtotal = subtotalTotal
-      // factura.iva = iva
-      // factura.total = total
       await factura.useTransaction(trx).save()
 
       await trx.commit()
