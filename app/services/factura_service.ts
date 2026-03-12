@@ -134,26 +134,14 @@ export default class FacturaService {
   }
 
   /**
-   * Obtiene una factura con todos sus detalles
+   * Listar todas las facturas
    */
-  async obtenerFactura(idFactura: number): Promise<Factura> {
-    const factura = await Factura.query()
-      .where('id_factura', idFactura)
-      .preload('cliente')
-      .preload('detalles', (query) => {
-        query.preload('producto')
-      })
-      .firstOrFail()
-
-    return factura
-  }
-
   async listarFacturas(filtros?: FiltrosFacturas) {
     const page = filtros?.page || 1
     const limit = filtros?.limit || 20
 
     const query = Factura.query()
-      .select(['id_factura', 'numero_factura', 'fecha_emision', 'estado', 'total'])
+      .select(['id_factura', 'numero_factura', 'id_cliente', 'fecha_emision', 'estado', 'total'])
       .preload('cliente', (clienteQuery) => {
         clienteQuery.select(['id_cliente', 'nombre'])
       })
@@ -183,7 +171,7 @@ export default class FacturaService {
         idFactura: factura.idFactura,
         numeroTicket: factura.numeroFactura,
         fecha: factura.fechaEmision,
-        cliente: factura.cliente?.nombre ?? 'Cliente no disponible',
+        cliente: factura.cliente?.nombre ?? 'Cliente no encontrado',
         estado: factura.estado,
         total: factura.total,
       })),
@@ -209,7 +197,7 @@ export default class FacturaService {
       idFactura: factura.idFactura,
       numeroTicket: factura.numeroFactura,
       fecha: factura.fechaEmision,
-      cliente: factura.cliente?.nombre,
+      cliente: factura.cliente?.nombre ?? 'Cliente no encontrado',
       estado: factura.estado,
       metodoPago: factura.metodoPago,
       subtotal: factura.subtotal,
