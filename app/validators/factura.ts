@@ -3,6 +3,7 @@ import vine from '@vinejs/vine'
 export const createFacturaValidator = vine.compile(
   vine.object({
     idCliente: vine.number().positive(),
+    numeroFactura: vine.string().trim(),
     items: vine.array(
       vine.object({
         idProducto: vine.number().positive(),

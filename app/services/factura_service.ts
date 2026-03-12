@@ -12,6 +12,7 @@ interface ItemFactura {
 
 interface DatosFactura {
   idCliente: number
+  numeroFactura: string
   items: ItemFactura[]
   metodoPago?: string
   notas?: string
@@ -28,17 +29,17 @@ export default class FacturaService {
   /**
    * Genera el siguiente número de factura
    */
-  private async generarNumeroFactura(): Promise<string> {
-    const ultimaFactura = await Factura.query().orderBy('id_factura', 'desc').first()
+  // private async generarNumeroFactura(): Promise<string> {
+  //   const ultimaFactura = await Factura.query().orderBy('id_factura', 'desc').first()
 
-    if (!ultimaFactura) {
-      return 'FAC-00001'
-    }
+  //   if (!ultimaFactura) {
+  //     return 'FAC-00001'
+  //   }
 
-    const numeroActual = Number.parseInt(ultimaFactura.numeroFactura.split('-')[1])
-    const nuevoNumero = numeroActual + 1
-    return `FAC-${nuevoNumero.toString().padStart(5, '0')}`
-  }
+  //   const numeroActual = Number.parseInt(ultimaFactura.numeroFactura.split('-')[1])
+  //   const nuevoNumero = numeroActual + 1
+  //   return `FAC-${nuevoNumero.toString().padStart(5, '0')}`
+  // }
 
   /**
    * Crea una nueva factura con sus detalles
@@ -49,11 +50,11 @@ export default class FacturaService {
 
     try {
       // Generar número de factura
-      const numeroFactura = await this.generarNumeroFactura()
+      // const numeroFactura = await this.generarNumeroFactura()
 
       // Crear factura
       const factura = new Factura()
-      factura.numeroFactura = numeroFactura
+      factura.numeroFactura = datos.numeroFactura
       factura.idCliente = datos.idCliente
       factura.metodoPago = datos.metodoPago || null
       factura.notas = datos.notas || null
