@@ -12,7 +12,8 @@ export const createFacturaValidator = vine.compile(
         precioUnitario: vine.number().min(0),
       })
     ),
-    metodoPago: vine.string().trim().optional(),
+    metodoPago: vine.string().trim(),
+    estado: vine.enum(['pagada', 'pendiente', 'anulada']),
     notas: vine.string().trim().optional(),
     usuarioCreacion: vine.string().trim().optional(),
     total: vine.number().min(0),

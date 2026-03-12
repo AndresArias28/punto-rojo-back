@@ -14,19 +14,14 @@ interface DatosFactura {
   idCliente: number
   numeroFactura: string
   items: ItemFactura[]
-  metodoPago?: string
+  metodoPago: string
+  estado: 'pagada' | 'pendiente' | 'anulada'
   notas?: string
   usuarioCreacion?: string
   total: number
 }
 
 export default class FacturaService {
-  // private precioService: PrecioService
-
-  constructor() {
-    // this.precioService = new PrecioService()
-  }
-
   /**
    * Crea una nueva factura con sus detalles
    */
@@ -41,19 +36,13 @@ export default class FacturaService {
       factura.idCliente = datos.idCliente
       factura.metodoPago = datos.metodoPago || null
       factura.notas = datos.notas || null
-      factura.estado = 'pagada'
+      factura.estado = datos.estado
       factura.total = datos.total
 
       await factura.useTransaction(trx).save()
 
       // Crear detalles de factura
       for (const item of datos.items) {
-        // Obtener precio correcto según cliente
-        // const precioUnitario = await this.precioService.obtenerPrecioParaCliente(
-        //   item.idProducto,
-        //   datos.idCliente
-        // )
-
         // Crear detalle
         const detalle = new DetalleFactura()
         detalle.idFactura = factura.idFactura
@@ -64,8 +53,6 @@ export default class FacturaService {
         //esto es para guardar en la base de datos
         await detalle.useTransaction(trx).save()
       }
-
-      await factura.useTransaction(trx).save()
 
       await trx.commit()
 
