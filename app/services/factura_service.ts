@@ -17,6 +17,7 @@ interface DatosFactura {
   metodoPago?: string
   notas?: string
   usuarioCreacion?: string
+  total: number
 }
 
 export default class FacturaService {
@@ -25,21 +26,6 @@ export default class FacturaService {
   constructor() {
     this.precioService = new PrecioService()
   }
-
-  /**
-   * Genera el siguiente número de factura
-   */
-  // private async generarNumeroFactura(): Promise<string> {
-  //   const ultimaFactura = await Factura.query().orderBy('id_factura', 'desc').first()
-
-  //   if (!ultimaFactura) {
-  //     return 'FAC-00001'
-  //   }
-
-  //   const numeroActual = Number.parseInt(ultimaFactura.numeroFactura.split('-')[1])
-  //   const nuevoNumero = numeroActual + 1
-  //   return `FAC-${nuevoNumero.toString().padStart(5, '0')}`
-  // }
 
   /**
    * Crea una nueva factura con sus detalles
@@ -59,15 +45,14 @@ export default class FacturaService {
       factura.metodoPago = datos.metodoPago || null
       factura.notas = datos.notas || null
       factura.estado = 'pagada'
+      factura.total = datos.total
 
       await factura.useTransaction(trx).save()
-
-      let subtotalTotal = 0
 
       // Crear detalles de factura
       for (const item of datos.items) {
         // Verificar stock
-        const producto = await Producto.findOrFail(item.idProducto)
+        // const producto = await Producto.findOrFail(item.idProducto)
 
         // Obtener precio correcto según cliente
         const precioUnitario = await this.precioService.obtenerPrecioParaCliente(
@@ -75,8 +60,8 @@ export default class FacturaService {
           datos.idCliente
         )
 
-        const descuento = item.descuento || 0
-        const subtotalLinea = item.cantidad * precioUnitario - descuento
+        // const descuento = item.descuento || 0
+        // const subtotalLinea = item.cantidad * precioUnitario - descuento
 
         // Crear detalle
         const detalle = new DetalleFactura()
@@ -84,26 +69,26 @@ export default class FacturaService {
         detalle.idProducto = item.idProducto
         detalle.cantidad = item.cantidad
         detalle.precioUnitario = precioUnitario
-        detalle.descuento = descuento
+        // detalle.descuento = descuento
 
         //esto es para guardar en la base de datos
         await detalle.useTransaction(trx).save()
 
         // Actualizar stock
-        producto.stock -= item.cantidad
-        await producto.useTransaction(trx).save()
+        // producto.stock -= item.cantidad
+        // await producto.useTransaction(trx).save()
 
-        subtotalTotal += subtotalLinea
+        // subtotalTotal += subtotalLinea
       }
 
       // Calcular IVA (19% en Colombia, ajusta según tu país)
-      const iva = subtotalTotal * 0.19
-      const total = subtotalTotal + iva
+      // const iva = subtotalTotal * 0.19
+      // const total = subtotalTotal + iva
 
       // Actualizar totales de factura
-      factura.subtotal = subtotalTotal
-      factura.iva = iva
-      factura.total = total
+      // factura.subtotal = subtotalTotal
+      // factura.iva = iva
+      // factura.total = total
       await factura.useTransaction(trx).save()
 
       await trx.commit()

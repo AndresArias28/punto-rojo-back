@@ -14,5 +14,6 @@ export const createFacturaValidator = vine.compile(
     metodoPago: vine.string().trim().optional(),
     notas: vine.string().trim().optional(),
     usuarioCreacion: vine.string().trim().optional(),
+    total: vine.number().min(0),
   })
 )
