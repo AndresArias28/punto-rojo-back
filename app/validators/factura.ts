@@ -9,6 +9,7 @@ export const createFacturaValidator = vine.compile(
         idProducto: vine.number().positive(),
         cantidad: vine.number().positive(),
         descuento: vine.number().min(0).optional(),
+        precioUnitario: vine.number().min(0),
       })
     ),
     metodoPago: vine.string().trim().optional(),

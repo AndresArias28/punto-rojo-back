@@ -8,6 +8,7 @@ interface ItemFactura {
   idProducto: number
   cantidad: number
   descuento?: number
+  precioUnitario: number
 }
 
 interface DatosFactura {
@@ -68,7 +69,7 @@ export default class FacturaService {
         detalle.idFactura = factura.idFactura
         detalle.idProducto = item.idProducto
         detalle.cantidad = item.cantidad
-        detalle.precioUnitario = precioUnitario
+        detalle.precioUnitario = item.precioUnitario
         // detalle.descuento = descuento
 
         //esto es para guardar en la base de datos
