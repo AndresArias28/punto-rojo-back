@@ -18,16 +18,19 @@ export default class FacturasController {
         idCliente: request.input('idCliente'),
         estado: request.input('estado'),
         fechaDesde: request.input('fechaDesde'),
-        fechaHasta: request.input('fechaHasta'),
-        page: request.input('page', 1),
-        limit: request.input('limit', 20),
+        metodoPago: request.input('metodoPago'),
+        page: Number(request.input('page', 1)),
+        limit: Number(request.input('limit', 20)),
       }
 
       const facturas = await this.facturaService.listarFacturas(filtros)
 
       return response.ok(facturas)
     } catch (error) {
-      return response.badRequest({ message: 'Error al listar facturas', error: error.message })
+      return response.badRequest({
+        message: 'Error al listar facturas',
+        error: error.message,
+      })
     }
   }
 
@@ -36,10 +39,19 @@ export default class FacturasController {
    */
   async show({ params, response }: HttpContext) {
     try {
-      const factura = await this.facturaService.obtenerFactura(params.id)
+      const idFactura = Number(params.id)
+
+      if (!idFactura || Number.isNaN(idFactura)) {
+        return response.badRequest({ message: 'ID de factura inválido' })
+      }
+
+      const factura = await this.facturaService.obtenerDetalleFactura(idFactura)
       return response.ok(factura)
     } catch (error) {
-      return response.notFound({ message: 'Factura no encontrada' })
+      return response.badRequest({
+        message: 'Error al obtener el detalle de la factura',
+        error: error.message,
+      })
     }
   }
 
@@ -61,51 +73,27 @@ export default class FacturasController {
   }
 
   /**
-   * DELETE /facturas/:id (anular)
+   * Anular /facturas/:id (anular)
    */
-  async destroy({ params, response }: HttpContext) {
+  async anular({ params, response }: HttpContext) {
     try {
-      const factura = await this.facturaService.anularFactura(params.id)
-      return response.ok({ message: 'Factura anulada correctamente', factura })
-    } catch (error) {
-      return response.badRequest({ message: 'Error al anular factura', error: error.message })
-    }
-  }
+      const idFactura = Number(params.id)
 
-  /**
-   * GET /facturas/:id/imprimir
-   * Retorna los datos formateados para impresión
-   */
-  async imprimir({ params, response }: HttpContext) {
-    try {
-      const factura = await this.facturaService.obtenerFactura(params.id)
-
-      // Formatear datos para impresión
-      const facturaImpresion = {
-        numero: factura.numeroFactura,
-        fecha: factura.fechaEmision.toFormat('dd/MM/yyyy HH:mm'),
-        cliente: {
-          nombre: factura.cliente.nombre,
-          documento: factura.cliente.documento,
-          direccion: factura.cliente.direccion,
-          telefono: factura.cliente.telefono,
-        },
-        items: factura.detalles.map((detalle) => ({
-          producto: detalle.producto.nombre,
-          cantidad: detalle.cantidad,
-          precioUnitario: detalle.precioUnitario,
-          descuento: detalle.descuento,
-        })),
-        subtotal: factura.subtotal,
-        iva: factura.iva,
-        total: factura.total,
-        metodoPago: factura.metodoPago,
-        notas: factura.notas,
+      if (!idFactura || Number.isNaN(idFactura)) {
+        return response.badRequest({ message: 'ID de factura inválido' })
       }
 
-      return response.ok(facturaImpresion)
+      const factura = await this.facturaService.anularFactura(idFactura)
+
+      return response.ok({
+        message: 'Factura anulada exitosamente',
+        factura,
+      })
     } catch (error) {
-      return response.notFound({ message: 'Factura no encontrada' })
+      return response.badRequest({
+        message: 'Error al anular la factura',
+        error: error.message,
+      })
     }
   }
 }

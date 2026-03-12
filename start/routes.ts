@@ -39,7 +39,7 @@ Route.group(() => {
   Route.get('/', [FacturasController, 'index'])
   Route.get('/:id', [FacturasController, 'show'])
   Route.post('/', [FacturasController, 'store'])
-  Route.delete('/:id', [FacturasController, 'destroy'])
+  Route.patch('/:id/anular', [FacturasController, 'anular'])
 }).prefix('/facturas')
 
 /* ---------------------------

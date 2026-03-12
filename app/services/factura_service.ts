@@ -1,7 +1,15 @@
 import Factura from '#models/factura'
 import DetalleFactura from '#models/detalle_factura'
-import Producto from '#models/producto'
 import db from '@adonisjs/lucid/services/db'
+
+type FiltrosFacturas = {
+  idCliente?: number
+  estado?: string
+  fechaDesde?: string
+  fechaHasta?: string
+  page?: number
+  limit?: number
+}
 
 interface ItemFactura {
   idProducto: number
@@ -22,6 +30,62 @@ interface DatosFactura {
 }
 
 export default class FacturaService {
+  /**
+   * Obtiene el detalle completo de una factura, incluyendo cliente y productos
+   */
+  async obtenerDetalleFactura(idFactura: number) {
+    const factura = await Factura.query()
+      .where('id_factura', idFactura)
+      .select([
+        'id_factura',
+        'numero_factura',
+        'fecha_emision',
+        'estado',
+        'subtotal',
+        'iva',
+        'total',
+        'metodo_pago',
+        'id_cliente',
+      ])
+      .preload('cliente', (clienteQuery) => {
+        clienteQuery.select(['id_cliente', 'nombre'])
+      })
+      .preload('detalles', (detalleQuery) => {
+        detalleQuery
+          .select([
+            'id_detalle',
+            'id_factura',
+            'id_producto',
+            'cantidad',
+            'precio_unitario',
+            'descuento',
+          ])
+          .preload('producto', (productoQuery) => {
+            productoQuery.select(['id_producto', 'nombre'])
+          })
+      })
+      .firstOrFail()
+
+    return {
+      idFactura: factura.idFactura,
+      numeroTicket: factura.numeroFactura,
+      fecha: factura.fechaEmision,
+      cliente: factura.cliente?.nombre,
+      estado: factura.estado,
+      metodoPago: factura.metodoPago,
+      subtotal: factura.subtotal,
+      iva: factura.iva,
+      total: factura.total,
+      detalles: factura.detalles.map((detalle) => ({
+        idDetalle: detalle.idDetalle,
+        producto: detalle.producto?.nombre,
+        cantidad: detalle.cantidad,
+        precioUnitario: detalle.precioUnitario,
+        descuento: detalle.descuento,
+      })),
+    }
+  }
+
   /**
    * Crea una nueva factura con sus detalles
    */
@@ -84,21 +148,16 @@ export default class FacturaService {
     return factura
   }
 
-  /**
-   * Lista facturas con filtros opcionales
-   */
-  async listarFacturas(filtros?: {
-    idCliente?: number
-    estado?: string
-    fechaDesde?: string
-    fechaHasta?: string
-    page?: number
-    limit?: number
-  }) {
+  async listarFacturas(filtros?: FiltrosFacturas) {
     const page = filtros?.page || 1
     const limit = filtros?.limit || 20
 
-    const query = Factura.query().preload('cliente').orderBy('fecha_emision', 'desc')
+    const query = Factura.query()
+      .select(['id_factura', 'numero_factura', 'fecha_emision', 'estado', 'total'])
+      .preload('cliente', (clienteQuery) => {
+        clienteQuery.select(['id_cliente', 'nombre'])
+      })
+      .orderBy('fecha_emision', 'desc')
 
     if (filtros?.idCliente) {
       query.where('id_cliente', filtros.idCliente)
@@ -116,41 +175,54 @@ export default class FacturaService {
       query.where('fecha_emision', '<=', filtros.fechaHasta)
     }
 
-    return await query.paginate(page, limit)
+    const resultado = await query.paginate(page, limit)
+
+    return {
+      meta: resultado.getMeta(),
+      data: resultado.all().map((factura) => ({
+        idFactura: factura.idFactura,
+        numeroTicket: factura.numeroFactura,
+        fecha: factura.fechaEmision,
+        cliente: factura.cliente?.nombre ?? 'Cliente no disponible',
+        estado: factura.estado,
+        total: factura.total,
+      })),
+    }
   }
 
-  /**
-   * Anula una factura
-   */
-  async anularFactura(idFactura: number): Promise<Factura> {
-    const trx = await db.transaction()
+  async anularFactura(idFactura: number) {
+    const factura = await Factura.findOrFail(idFactura)
 
-    try {
-      const factura = await Factura.findOrFail(idFactura)
+    if (factura.estado === 'anulada') {
+      throw new Error('La factura ya se encuentra anulada')
+    }
 
-      if (factura.estado === 'anulada') {
-        throw new Error('La factura ya está anulada')
-      }
+    factura.estado = 'anulada'
+    await factura.save()
 
-      // Cargar detalles
-      await factura.load('detalles')
+    await factura.load('cliente')
+    await factura.load('detalles', (query) => {
+      query.preload('producto')
+    })
 
-      // Devolver stock
-      for (const detalle of factura.detalles) {
-        const producto = await Producto.findOrFail(detalle.idProducto)
-        producto.stock += detalle.cantidad
-        await producto.useTransaction(trx).save()
-      }
-
-      // Anular factura
-      factura.estado = 'anulada'
-      await factura.useTransaction(trx).save()
-
-      await trx.commit()
-      return factura
-    } catch (error) {
-      await trx.rollback()
-      throw error
+    return {
+      idFactura: factura.idFactura,
+      numeroTicket: factura.numeroFactura,
+      fecha: factura.fechaEmision,
+      cliente: factura.cliente?.nombre,
+      estado: factura.estado,
+      metodoPago: factura.metodoPago,
+      subtotal: factura.subtotal,
+      iva: factura.iva,
+      total: factura.total,
+      detalles: factura.detalles.map((detalle) => ({
+        idDetalle: detalle.idDetalle,
+        producto: detalle.producto?.nombre,
+        cantidad: detalle.cantidad,
+        precioUnitario: detalle.precioUnitario,
+        descuento: detalle.descuento,
+        subtotalLinea: detalle.cantidad * detalle.precioUnitario - (detalle.descuento || 0),
+      })),
     }
   }
 }
